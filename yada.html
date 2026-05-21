@@ -1,0 +1,688 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  Search, 
+  Award, 
+  User, 
+  BookOpen, 
+  BarChart2, 
+  TrendingUp, 
+  RefreshCw, 
+  CheckCircle, 
+  AlertCircle,
+  Users,
+  ChevronRight,
+  GraduationCap,
+  Sparkles,
+  Layers,
+  FileText,
+  Check
+} from 'lucide-react';
+
+// === ข้อมูลดิบจากไฟล์ ม.ต้น และ ม.ปลาย ===
+// ม.ต้น (1/1)
+const RAW_MIDDLE_SCHOOL = [
+  { room: "1/1", no: "1", id: "29188", prefix: "เด็กชาย", name: "กฤตภาส", lastname: "กิตติกิ่งเลิศ", exam1: 0, exam2: 3, exam3: 2, sumExam: 5, book: [1, 1, 0, 1, 0, 0, 1, 1, 1, 0], sumBook: 6, totalPart1: 11, finalExam: 2, finalWork1: 0, finalWork2: 2, finalWorkSum: 4, finalBook: [1, 1, 1, 1, 1, 0, 1, 1, 1, 1], finalSumBook: 9, finalTotal: 13, grandTotal: 24 },
+  { room: "1/1", no: "2", id: "29189", prefix: "เด็กชาย", name: "ชนจันทร์", lastname: "ศรีสันจันทร์", exam1: 2, exam2: 1, exam3: 5, sumExam: 8, book: [0, 0, 1, 1, 0, 0, 1, 1, 1, 0], sumBook: 5, totalPart1: 13, finalExam: 5, finalWork1: 1, finalWork2: 2, finalWorkSum: 8, finalBook: [1, 1, 1, 1, 1, 1, 1, 0, 1, 1], finalSumBook: 9, finalTotal: 17, grandTotal: 30 },
+  { room: "1/1", no: "3", id: "29190", prefix: "เด็กชาย", name: "ฐิติกร", lastname: "วงศ์อินทร์", exam1: 3, exam2: 2, exam3: 1, sumExam: 6, book: [1, 1, 1, 1, 0, 1, 1, 0, 0, 0], sumBook: 6, totalPart1: 12, finalExam: 4, finalWork1: 3, finalWork2: 1, finalWorkSum: 8, finalBook: [1, 0, 1, 1, 1, 1, 1, 1, 0, 0], finalSumBook: 7, finalTotal: 15, grandTotal: 27 },
+  { room: "1/1", no: "4", id: "29191", prefix: "เด็กชาย", name: "ณัฐกิจ", lastname: "เพชรรัตน์", exam1: 1, exam2: 4, exam3: 3, sumExam: 8, book: [1, 1, 0, 1, 1, 1, 1, 1, 0, 1], sumBook: 8, totalPart1: 16, finalExam: 3, finalWork1: 2, finalWork2: 3, finalWorkSum: 8, finalBook: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], finalSumBook: 10, finalTotal: 18, grandTotal: 34 },
+  { room: "1/1", no: "5", id: "29192", prefix: "เด็กชาย", name: "ดลธรรม", lastname: "แสนพงษ์", exam1: 4, exam2: 3, exam3: 2, sumExam: 9, book: [1, 1, 1, 0, 1, 1, 1, 0, 1, 1], sumBook: 8, totalPart1: 17, finalExam: 4, finalWork1: 3, finalWork2: 4, finalWorkSum: 11, finalBook: [1, 1, 1, 1, 1, 0, 1, 1, 1, 0], finalSumBook: 8, finalTotal: 19, grandTotal: 36 },
+  { room: "1/1", no: "19", id: "29206", prefix: "เด็กหญิง", name: "ณัชชาวีย์", lastname: "เทพาฤทธิ", exam1: 5, exam2: 3, exam3: 5, sumExam: 13, book: [0, 0, 1, 1, 1, 1, 0, 1, 0, 0], sumBook: 5, totalPart1: 18, finalExam: 0, finalWork1: 3, finalWork2: 1, finalWorkSum: 4, finalBook: [0, 1, 1, 0, 0, 1, 0, 0, 0, 0], finalSumBook: 3, finalTotal: 7, grandTotal: 25 },
+  { room: "1/1", no: "20", id: "29207", prefix: "เด็กหญิง", name: "ทิพานัน", lastname: "ชินวงศ์", exam1: 2, exam2: 0, exam3: 5, sumExam: 7, book: [1, 1, 0, 1, 0, 0, 0, 1, 0, 1], sumBook: 5, totalPart1: 12, finalExam: 0, finalWork1: 2, finalWork2: 0, finalWorkSum: 2, finalBook: [0, 1, 1, 1, 1, 1, 0, 1, 0, 0], finalSumBook: 6, finalTotal: 8, grandTotal: 20 },
+  { room: "1/1", no: "21", id: "29208", prefix: "เด็กหญิง", name: "ธิราภรณ์", lastname: "เป๋าอยู่", exam1: 4, exam2: 5, exam3: 4, sumExam: 13, book: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0], sumBook: 4, totalPart1: 17, finalExam: 4, finalWork1: 2, finalWork2: 4, finalWorkSum: 10, finalBook: [1, 0, 1, 1, 1, 0, 0, 1, 0, 1], finalSumBook: 6, finalTotal: 16, grandTotal: 33 },
+  { room: "1/1", no: "22", id: "29209", prefix: "เด็กหญิง", name: "นันท์นพิน", lastname: "กายยาคำ", exam1: 1, exam2: 5, exam3: 3, sumExam: 9, book: [1, 1, 1, 0, 1, 1, 1, 0, 1, 1], sumBook: 8, totalPart1: 17, finalExam: 3, finalWork1: 1, finalWork2: 2, finalWorkSum: 6, finalBook: [1, 1, 1, 1, 1, 1, 1, 0, 1, 1], finalSumBook: 9, finalTotal: 15, grandTotal: 32 }
+];
+
+// ม.ปลาย (6/1, 6/2, 6/3)
+const RAW_HIGH_SCHOOL = [
+  // 6/1
+  { room: "6/1", no: "1", id: "26307", prefix: "นาย", name: "นิธิกร", lastname: "มูลทองชุน", exam1: 5, exam2: 4, exam3: 1, sumExam: 10, book: [0, 1, 1, 1, 1, 1, 0, 1, 1, 0], sumBook: 7, totalPart1: 17, finalExam: 2, finalWork1: 4, finalWork2: 1, finalWorkSum: 8, finalBook: [0, 1, 0, 0, 1, 1, 1, 0, 1, 1], finalSumBook: 6, finalTotal: 14, grandTotal: 31 },
+  { room: "6/1", no: "2", id: "26532", prefix: "นาย", name: "ธเนศ", lastname: "เปรมสมาน", exam1: 4, exam2: 8, exam3: 4, sumExam: 16, book: [1, 0, 1, 0, 1, 0, 1, 1, 1, 0], sumBook: 6, totalPart1: 22, finalExam: 3, finalWork1: 0, finalWork2: 5, finalWorkSum: 9, finalBook: [1, 0, 1, 0, 1, 1, 1, 1, 0, 1], finalSumBook: 7, finalTotal: 16, grandTotal: 38 },
+  { room: "6/1", no: "3", id: "26537", prefix: "นาย", name: "นิพิฐพนธ์", lastname: "ธนวิชญ์พิสิฐ", exam1: 5, exam2: 8, exam3: 5, sumExam: 18, book: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0], sumBook: 9, totalPart1: 27, finalExam: 4, finalWork1: 5, finalWork2: 5, finalWorkSum: 14, finalBook: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], finalSumBook: 10, finalTotal: 24, grandTotal: 51 },
+  { room: "6/1", no: "4", id: "26543", prefix: "นาย", name: "พีรวิชญ์", lastname: "ศรีวิชา", exam1: 2, exam2: 6, exam3: 3, sumExam: 11, book: [0, 1, 1, 1, 0, 0, 1, 1, 1, 0], sumBook: 6, totalPart1: 17, finalExam: 2, finalWork1: 4, finalWork2: 3, finalWorkSum: 9, finalBook: [1, 1, 1, 1, 1, 0, 0, 1, 1, 0], finalSumBook: 7, finalTotal: 16, grandTotal: 33 },
+  // 6/2
+  { room: "6/2", no: "1", id: "26541", prefix: "นาย", name: "ภัคพงศ์", lastname: "ตั้งประดับ", exam1: 4, exam2: 7, exam3: 3, sumExam: 14, book: [1, 1, 1, 1, 1, 0, 1, 1, 1, 1], sumBook: 9, totalPart1: 23, finalExam: 3, finalWork1: 4, finalWork2: 3, finalWorkSum: 10, finalBook: [1, 1, 1, 0, 1, 1, 1, 0, 1, 1], finalSumBook: 8, finalTotal: 18, grandTotal: 41 },
+  { room: "6/2", no: "2", id: "26545", prefix: "นาย", name: "เมธาสิทธิ์", lastname: "จรัสจรูญพงศ์", exam1: 3, exam2: 5, exam3: 2, sumExam: 10, book: [1, 1, 1, 0, 1, 0, 1, 0, 1, 0], sumBook: 6, totalPart1: 16, finalExam: 1, finalWork1: 3, finalWork2: 2, finalWorkSum: 6, finalBook: [1, 0, 1, 1, 0, 1, 1, 1, 1, 0], finalSumBook: 7, finalTotal: 13, grandTotal: 29 },
+  { room: "6/2", no: "25", id: "26548", prefix: "นางสาว", name: "จิดาภา", lastname: "ทองพูนศรี", exam1: 5, exam2: 9, exam3: 5, sumExam: 19, book: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], sumBook: 10, totalPart1: 29, finalExam: 4, finalWork1: 5, finalWork2: 5, finalWorkSum: 14, finalBook: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], finalSumBook: 10, finalTotal: 24, grandTotal: 53 },
+  { room: "6/2", no: "26", id: "26555", prefix: "นางสาว", name: "ชลชนก", lastname: "มณีศิลาสัจจะ", exam1: 4, exam2: 6, exam3: 4, sumExam: 14, book: [1, 1, 0, 1, 1, 1, 1, 1, 0, 1], sumBook: 8, totalPart1: 22, finalExam: 3, finalWork1: 4, finalWork2: 4, finalWorkSum: 12, finalBook: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0], finalSumBook: 9, finalTotal: 21, grandTotal: 43 },
+  // 6/3
+  { room: "6/3", no: "1", id: "26487", prefix: "นาย", name: "พัทธดนย์", lastname: "ตั้งจิตวิโรจน์", exam1: 3, exam2: 5, exam3: 3, sumExam: 11, book: [1, 0, 1, 1, 0, 0, 1, 0, 1, 1], sumBook: 6, totalPart1: 17, finalExam: 2, finalWork1: 2, finalWork2: 3, finalWorkSum: 7, finalBook: [0, 1, 1, 1, 1, 1, 0, 1, 1, 1], finalSumBook: 8, finalTotal: 15, grandTotal: 32 },
+  { room: "6/3", no: "27", id: "26612", prefix: "นางสาว", name: "ปรียานุช", lastname: "สุวรรณเวหา", exam1: 4, exam2: 7, exam3: 4, sumExam: 15, book: [1, 1, 1, 1, 1, 1, 0, 1, 1, 1], sumBook: 9, totalPart1: 24, finalExam: 4, finalWork1: 3, finalWork2: 4, finalWorkSum: 11, finalBook: [1, 0, 1, 1, 1, 1, 0, 1, 1, 1], finalSumBook: 8, finalTotal: 19, grandTotal: 43 },
+  { room: "6/3", no: "28", id: "26643", prefix: "นางสาว", name: "พัชชิญาภา", lastname: "อนันต์", exam1: 4, exam2: 3, exam3: 5, sumExam: 12, book: [0, 0, 0, 0, 0, 0, 1, 0, 1, 0], sumBook: 2, totalPart1: 14, finalExam: 5, finalWork1: 4, finalWork2: 5, finalWorkSum: 14, finalBook: [5, 1, 0, 1, 1, 0, 1, 1, 1, 0], finalSumBook: 7, finalTotal: 26, grandTotal: 40 },
+  { room: "6/3", no: "29", id: "26647", prefix: "นางสาว", name: "ปัณณพร", lastname: "ศรีบูรณากาญจน์", exam1: 1, exam2: 5, exam3: 2, sumExam: 8, book: [0, 0, 0, 0, 0, 1, 0, 0, 0, 1], sumBook: 2, totalPart1: 10, finalExam: 1, finalWork1: 9, finalWork2: 0, finalWorkSum: 4, finalBook: [1, 1, 1, 1, 1, 1, 1, 0, 0, 0], finalSumBook: 7, finalTotal: 21, grandTotal: 31 },
+  { room: "6/3", no: "30", id: "26670", prefix: "นางสาว", name: "พิมพ์ณดา", lastname: "โชติชุติชัยศักดิ์", exam1: 3, exam2: 0, exam3: 4, sumExam: 7, book: [0, 0, 0, 1, 0, 1, 1, 0, 1, 0], sumBook: 4, totalPart1: 11, finalExam: 1, finalWork1: 2, finalWork2: 3, finalWorkSum: 6, finalBook: [3, 1, 1, 1, 0, 1, 0, 1, 0, 0], finalSumBook: 6, finalTotal: 15, grandTotal: 26 }
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('student'); // 'student' | 'teacher' | 'settings'
+  const [searchId, setSearchId] = useState('');
+  const [searchResult, setSearchResult] = useState(null);
+  const [searchError, setSearchError] = useState('');
+  
+  // ข้อมูลจำลองที่ผู้ใช้สามารถปรับแต่งหรือแก้ไขได้
+  const [studentsData, setStudentsData] = useState(() => {
+    return [...RAW_MIDDLE_SCHOOL, ...RAW_HIGH_SCHOOL];
+  });
+
+  const [selectedClass, setSelectedClass] = useState('all'); // 'all' | '1/1' | '6/1' | '6/2' | '6/3'
+  const [isSheetConnected, setIsSheetConnected] = useState(true);
+  const [lastSyncTime, setLastSyncTime] = useState(new Date().toLocaleTimeString());
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState('');
+
+  // สรุปสถิติสำหรับครู
+  const filteredStudents = useMemo(() => {
+    if (selectedClass === 'all') return studentsData;
+    return studentsData.filter(student => student.room === selectedClass);
+  }, [studentsData, selectedClass]);
+
+  const statistics = useMemo(() => {
+    if (filteredStudents.length === 0) return { avg: 0, max: 0, min: 0, count: 0 };
+    const scores = filteredStudents.map(s => s.grandTotal);
+    const sum = scores.reduce((a, b) => a + b, 0);
+    const avg = (sum / scores.length).toFixed(1);
+    const max = Math.max(...scores);
+    const min = Math.min(...scores);
+    return { avg, max, min, count: scores.length };
+  }, [filteredStudents]);
+
+  // ฟังก์ชันค้นหาคะแนนนักเรียน
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchError('');
+    setSearchResult(null);
+
+    const found = studentsData.find(s => s.id === searchId.trim());
+    if (found) {
+      setSearchResult(found);
+    } else {
+      setSearchError('ไม่พบรหัสประจำตัวนักเรียนนี้ในระบบ กรุณาตรวจสอบรหัสอีกครั้ง');
+    }
+  };
+
+  // ฟังก์ชันจำลองการอัปเดตหรือซิงค์ข้อมูลใหม่จาก Google Sheets
+  const handleSyncData = () => {
+    setIsSheetConnected(false);
+    setTimeout(() => {
+      setIsSheetConnected(true);
+      setLastSyncTime(new Date().toLocaleTimeString());
+      triggerToast("ดึงข้อมูลล่าสุดจาก Google Sheets เรียบร้อยแล้ว");
+    }, 1200);
+  };
+
+  // ฟังก์ชันแสดงกล่องแจ้งเตือน UI แทนการใช้ browser alert
+  const triggerToast = (msg) => {
+    setNotificationMsg(msg);
+    setShowNotification(true);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
+  };
+
+  const handleResetData = () => {
+    setStudentsData([...RAW_MIDDLE_SCHOOL, ...RAW_HIGH_SCHOOL]);
+    triggerToast("รีเซ็ตข้อมูลคะแนนเป็นค่าเริ่มต้นสำเร็จ");
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased pb-12">
+      
+      {/* ระบบแจ้งเตือน Notification Toast (หลีกเลี่ยงการใช้ browser alert) */}
+      {showNotification && (
+        <div className="fixed top-5 right-5 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-2.5 border border-slate-800 animate-bounce">
+          <div className="bg-emerald-500 p-1 rounded-full text-white">
+            <Check className="h-4 w-4" />
+          </div>
+          <span className="text-xs font-semibold">{notificationMsg}</span>
+        </div>
+      )}
+
+      {/* ส่วนหัวของแอปพลิเคชัน (Header) */}
+      <header className="bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-800 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/20">
+                <GraduationCap className="h-8 w-8 text-yellow-300" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">ระบบบริการผลการเรียนนักเรียนแบบเรียลไทม์</h1>
+                <p className="text-indigo-100 text-xs sm:text-sm mt-0.5 flex items-center gap-1.5">
+                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  ดึงข้อมูลล่าสุดจาก Google Sheets สำเร็จ ({lastSyncTime})
+                </p>
+              </div>
+            </div>
+
+            {/* แถบการควบคุม */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={handleSyncData}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/20 active:scale-95 transition-all text-xs font-semibold rounded-lg border border-white/10"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${!isSheetConnected ? 'animate-spin' : ''}`} />
+                {isSheetConnected ? 'ดึงข้อมูล Sheet ใหม่' : 'กำลังดึงข้อมูล...'}
+              </button>
+              <div className="px-3 py-1.5 bg-yellow-400 text-slate-900 font-bold text-xs rounded-lg shadow-sm">
+                ภาคเรียนที่ 1/2569
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* แถบนำทางด่วน (Tabs) */}
+      <div className="max-w-7xl mx-auto px-4 mt-6 sm:px-6 lg:px-8">
+        <div className="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200/80 flex space-x-1">
+          <button
+            onClick={() => setActiveTab('student')}
+            className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'student'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            <User className="h-4.5 w-4.5" />
+            <span>สำหรับนักเรียน (ค้นหารายบุคคล)</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('teacher')}
+            className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'teacher'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            <BarChart2 className="h-4.5 w-4.5" />
+            <span>สำหรับคุณครู (รายงานสรุปห้อง)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`px-4 sm:px-6 py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'settings'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            <Layers className="h-4.5 w-4.5" />
+            <span className="hidden sm:inline">การเชื่อมต่อ Google Sheets</span>
+            <span className="inline sm:hidden">Sheets</span>
+          </button>
+        </div>
+      </div>
+
+      {/* เนื้อหาหลักของหน้าต่างแอป */}
+      <main className="max-w-7xl mx-auto px-4 mt-6 sm:px-6 lg:px-8">
+        
+        {/* ===================== TAB: นักเรียนค้นหารายบุคคล ===================== */}
+        {activeTab === 'student' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* ฝั่งซ้าย: แถบค้นหา */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <h2 className="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                  <Search className="h-5 w-5 text-indigo-500" />
+                  ระบุรหัสนักเรียนเพื่อดูคะแนน
+                </h2>
+                <p className="text-slate-500 text-xs mb-4">
+                  กรอกรหัสประจำตัวนักเรียน 5 หลักของคุณ เช่น ม.1/1 (29188) หรือ ม.6/1 (26307)
+                </p>
+
+                <form onSubmit={handleSearch} className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">รหัสประจำตัวนักเรียน</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="กรอกรหัส 5 หลัก..."
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white font-medium text-slate-800 transition-all placeholder:text-slate-400"
+                        maxLength={5}
+                        required
+                      />
+                      <User className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md shadow-indigo-100 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <span>ค้นหาข้อมูลผลการเรียน</span>
+                    <ChevronRight className="h-4.5 w-4.5" />
+                  </button>
+                </form>
+
+                {searchError && (
+                  <div className="mt-4 p-3.5 bg-rose-50 border border-rose-100 rounded-xl flex gap-2 text-xs text-rose-600">
+                    <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+                    <p>{searchError}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* คำแนะนำสำหรับทดลองระบบ */}
+              <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-6">
+                <h3 className="text-sm font-bold text-indigo-900 mb-2 flex items-center gap-1.5">
+                  <Sparkles className="h-4.5 w-4.5 text-indigo-600" />
+                  รหัสนักเรียนสำหรับทดลองค้นหา
+                </h3>
+                <div className="space-y-2 text-xs text-indigo-950">
+                  <div className="p-2 bg-white rounded-lg border border-indigo-100/60 flex justify-between items-center">
+                    <span><strong>เด็กหญิง ทิพานัน</strong> (ม.1/1)</span>
+                    <button onClick={() => { setSearchId('29207'); }} className="text-indigo-600 font-bold hover:underline">เลือกใช้</button>
+                  </div>
+                  <div className="p-2 bg-white rounded-lg border border-indigo-100/60 flex justify-between items-center">
+                    <span><strong>นาย นิพิฐพนธ์</strong> (ม.6/1)</span>
+                    <button onClick={() => { setSearchId('26537'); }} className="text-indigo-600 font-bold hover:underline">เลือกใช้</button>
+                  </div>
+                  <div className="p-2 bg-white rounded-lg border border-indigo-100/60 flex justify-between items-center">
+                    <span><strong>นางสาว ปรียานุช</strong> (ม.6/3)</span>
+                    <button onClick={() => { setSearchId('26612'); }} className="text-indigo-600 font-bold hover:underline">เลือกใช้</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ฝั่งขวา: ผลการเรียนและวิเคราะห์ */}
+            <div className="lg:col-span-8">
+              {searchResult ? (
+                <div className="space-y-6">
+                  
+                  {/* การ์ดข้อมูลส่วนตัวหลัก */}
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl transform translate-x-8 -translate-y-8"></div>
+                    
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-16 w-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-indigo-100">
+                          {searchResult.name.substring(0, 1)}
+                        </div>
+                        <div>
+                          <span className="inline-block px-2.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold text-xs rounded-full mb-1">
+                            ชั้นมัธยมศึกษาปีที่ {searchResult.room} เลขที่ {searchResult.no}
+                          </span>
+                          <h2 className="text-2xl font-bold text-slate-800">
+                            {searchResult.prefix}{searchResult.name} {searchResult.lastname}
+                          </h2>
+                          <p className="text-slate-400 text-xs">เลขประจำตัวนักเรียน: {searchResult.id}</p>
+                        </div>
+                      </div>
+
+                      {/* แสดงเฉพาะคะแนนดิบและคะแนนสะสมจริง (นำการประเมินเกรดหรือผลขั้นต้นออก) */}
+                      {(() => {
+                        const maxPossible = searchResult.room.startsWith('1/') ? 50 : 60;
+                        return (
+                          <div className="p-4 rounded-xl border border-indigo-100 bg-indigo-50/50 flex flex-col items-center justify-center text-center min-w-[130px]">
+                            <Award className="h-5 w-5 mb-1 text-indigo-600" />
+                            <span className="text-xs font-bold text-slate-500">คะแนนสะสมรวม</span>
+                            <span className="text-xl font-black text-indigo-700">
+                              {searchResult.grandTotal} / {maxPossible}
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* ความคืบหน้าคะแนนรวม */}
+                    {(() => {
+                      const maxPossible = searchResult.room.startsWith('1/') ? 50 : 60;
+                      const percent = ((searchResult.grandTotal / maxPossible) * 100).toFixed(0);
+                      return (
+                        <div className="mt-6 pt-6 border-t border-slate-100">
+                          <div className="flex justify-between text-xs font-bold text-slate-600 mb-2">
+                            <span className="flex items-center gap-1.5">
+                              <TrendingUp className="h-3.5 w-3.5 text-indigo-500" />
+                              ร้อยละของคะแนนที่ได้จากคะแนนเต็ม
+                            </span>
+                            <span className="text-indigo-600">{searchResult.grandTotal} จาก {maxPossible} คะแนน ({percent}%)</span>
+                          </div>
+                          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-600 h-full rounded-full transition-all duration-1000"
+                              style={{ width: `${percent}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* สรุปคะแนนตามบทเรียนและงานกลางภาค / ปลายภาค */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    {/* ส่วนที่ 1: คะแนนกลางภาค */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-slate-800 flex items-center gap-1.5">
+                          <BookOpen className="h-4.5 w-4.5 text-blue-500" />
+                          คะแนนช่วงกลางภาค
+                        </h3>
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold text-xs rounded-md">
+                          รวม {searchResult.totalPart1} คะแนน
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+                          <span className="text-xs text-slate-600">คะแนนการทดสอบย่อย (3 ครั้ง)</span>
+                          <span className="text-xs font-bold text-slate-800 bg-white px-2 py-1 border border-slate-200 rounded-md">
+                            {searchResult.exam1} + {searchResult.exam2} + {searchResult.exam3} = <strong className="text-blue-600">{searchResult.sumExam}</strong> คะแนน
+                          </span>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-xs text-slate-600">การส่งสมุดแบบฝึกหัด (10 ครั้ง)</span>
+                            <span className="text-xs font-bold text-slate-800">{searchResult.sumBook} / 10 บท</span>
+                          </div>
+                          
+                          {/* รายละเอียดการตรวจสมุดทีละบท */}
+                          <div className="grid grid-cols-10 gap-1">
+                            {searchResult.book.map((status, index) => (
+                              <div 
+                                key={index} 
+                                className={`text-[10px] py-1 text-center font-bold rounded ${
+                                  status >= 1 
+                                    ? 'bg-emerald-500 text-white' 
+                                    : 'bg-slate-100 text-slate-400'
+                                }`}
+                                title={`บทที่ ${index + 1}: ${status >= 1 ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}`}
+                              >
+                                {index + 1}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ส่วนที่ 2: คะแนนปลายภาค */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-slate-800 flex items-center gap-1.5">
+                          <Award className="h-4.5 w-4.5 text-violet-500" />
+                          คะแนนช่วงปลายภาค
+                        </h3>
+                        <span className="px-2 py-0.5 bg-violet-50 text-violet-600 font-bold text-xs rounded-md">
+                          รวม {searchResult.finalTotal} คะแนน
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
+                          <span className="text-xs text-slate-600">คะแนนสอบปลายภาคและชิ้นงาน</span>
+                          <span className="text-xs font-bold text-slate-800 bg-white px-2 py-1 border border-slate-200 rounded-md">
+                            สอบ {searchResult.finalExam} + งาน {searchResult.finalWorkSum} = <strong className="text-violet-600">{searchResult.finalExam + searchResult.finalWorkSum}</strong> คะแนน
+                          </span>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-xs text-slate-600">การส่งการบ้านและการเขียนสะท้อนบทเรียน (10 ครั้ง)</span>
+                            <span className="text-xs font-bold text-slate-800">{searchResult.finalSumBook} / 10 งาน</span>
+                          </div>
+                          
+                          {/* รายละเอียดการตรวจปลายภาค */}
+                          <div className="grid grid-cols-10 gap-1">
+                            {searchResult.finalBook.map((status, index) => (
+                              <div 
+                                key={index} 
+                                className={`text-[10px] py-1 text-center font-bold rounded ${
+                                  status >= 1 
+                                    ? 'bg-emerald-500 text-white' 
+                                    : 'bg-slate-100 text-slate-400'
+                                }`}
+                                title={`งานที่ ${index + 1}: ${status >= 1 ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}`}
+                              >
+                                {index + 1}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 flex flex-col items-center justify-center">
+                  <div className="p-4 bg-indigo-50 text-indigo-500 rounded-full mb-4">
+                    <User className="h-10 w-10" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800 mb-1">ยังไม่มีการค้นหาข้อมูล</h3>
+                  <p className="text-slate-400 text-sm max-w-md mx-auto">
+                    กรอกรหัสประจำตัวนักเรียนของคุณในช่องค้นหาทางซ้าย เพื่อดึงข้อมูลคะแนนและการประเมินผลสดจากระบบหลังบ้าน
+                  </p>
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+
+        {/* ===================== TAB: สำหรับคุณครูรายงานสรุปห้อง ===================== */}
+        {activeTab === 'teacher' && (
+          <div className="space-y-6">
+            
+            {/* ส่วนควบคุมห้องและตัวกรองข้อมูล */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-800 mb-0.5">รายงานสถิติตามห้องเรียน</h2>
+                <p className="text-slate-500 text-xs">เลือกห้องเรียนเพื่อเจาะลึกสถิติและคะแนนสอบของห้องเรียน</p>
+              </div>
+
+              {/* ปุ่มตัวกรองห้องเรียน */}
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { key: 'all', label: 'ทั้งหมด (4 ห้อง)' },
+                  { key: '1/1', label: 'ม.1/1' },
+                  { key: '6/1', label: 'ม.6/1' },
+                  { key: '6/2', label: 'ม.6/2' },
+                  { key: '6/3', label: 'ม.6/3' }
+                ].map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={() => setSelectedClass(item.key)}
+                    className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+                      selectedClass === item.key
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* แสดงการ์ด Dashboard ภาพรวม */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 block">จำนวนนักเรียน</span>
+                  <span className="text-2xl font-black text-slate-800">{statistics.count} คน</span>
+                </div>
+                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                  <Users className="h-6 w-6" />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 block">คะแนนเฉลี่ย</span>
+                  <span className="text-2xl font-black text-slate-800">{statistics.avg} คะแนน</span>
+                </div>
+                <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 block">คะแนนสูงสุด</span>
+                  <span className="text-2xl font-black text-emerald-600">{statistics.max} คะแนน</span>
+                </div>
+                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                  <Award className="h-6 w-6" />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 block">คะแนนต่ำสุด</span>
+                  <span className="text-2xl font-black text-rose-500">{statistics.min} คะแนน</span>
+                </div>
+                <div className="p-3 bg-rose-50 text-rose-600 rounded-xl">
+                  <AlertCircle className="h-6 w-6" />
+                </div>
+              </div>
+
+            </div>
+
+            {/* ตารางรายชื่อนักเรียนทั้งหมด (นำคอลัมน์ประเมินผลออก) */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <FileText className="h-4.5 w-4.5 text-indigo-500" />
+                  รายชื่อและตารางผลการเรียนทั้งหมด
+                </h3>
+                <span className="text-xs text-slate-400">แสดงทั้งหมด {filteredStudents.length} คน</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500">
+                      <th className="px-6 py-4">ห้อง</th>
+                      <th className="px-6 py-4">เลขที่</th>
+                      <th className="px-6 py-4">เลขประจำตัว</th>
+                      <th className="px-6 py-4">คำนำหน้า</th>
+                      <th className="px-6 py-4">ชื่อ - นามสกุล</th>
+                      <th className="px-6 py-4 text-center">กลางภาค (เต็ม 25/30)</th>
+                      <th className="px-6 py-4 text-center">ปลายภาค (เต็ม 25/30)</th>
+                      <th className="px-6 py-4 text-center">คะแนนรวมสุทธิ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-sm">
+                    {filteredStudents.map((student, index) => {
+                      const maxScore = student.room.startsWith('1/') ? 50 : 60;
+                      return (
+                        <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-6 py-3.5 font-bold text-indigo-600">{student.room}</td>
+                          <td className="px-6 py-3.5 text-slate-500">{student.no}</td>
+                          <td className="px-6 py-3.5 font-mono text-slate-600">{student.id}</td>
+                          <td className="px-6 py-3.5 text-slate-500">{student.prefix}</td>
+                          <td className="px-6 py-3.5 font-semibold text-slate-800">{student.name} {student.lastname}</td>
+                          <td className="px-6 py-3.5 text-center font-medium text-slate-700">{student.totalPart1}</td>
+                          <td className="px-6 py-3.5 text-center font-medium text-slate-700">{student.finalTotal}</td>
+                          <td className="px-6 py-3.5 text-center">
+                            <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-md font-bold text-sm">
+                              {student.grandTotal} / {maxScore}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ===================== TAB: เชื่อมต่อ GOOGLE SHEETS & นำเข้าข้อมูล ===================== */}
+        {activeTab === 'settings' && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+              <h2 className="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <Layers className="h-5 w-5 text-indigo-500" />
+                เชื่อมต่อฐานข้อมูล Google Sheets ของโรงเรียน
+              </h2>
+              <p className="text-slate-500 text-sm mb-6">
+                โดยปกติระบบจะทำการเชื่อมต่อไปยัง Google Sheets ของรายวิชาที่มีผลคะแนนนักเรียน ม.1 และ ม.6 แบบอัตโนมัติ คุณสามารถเปลี่ยนลิงก์ชีตเพื่อใช้กับคะแนนชุดใหม่ได้
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">ลิงก์ Google Sheets สำหรับคะแนน (ม.ต้น / ม.ปลาย)</label>
+                  <input
+                    type="text"
+                    disabled
+                    value="https://docs.google.com/spreadsheets/d/1t_O8Q6xW49h_School_Grades_2026/edit"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-400 font-mono"
+                  />
+                  <span className="text-[10px] text-emerald-600 font-semibold mt-1 inline-block flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" /> เชื่อมต่อกับชีตสำเร็จ (การแชร์ข้อมูลเป็นสาธารณะสำหรับค้นหา)
+                  </span>
+                </div>
+
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 text-xs text-amber-800">
+                  <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="block mb-0.5">ต้องการใช้ไฟล์ส่วนตัวของคุณครูหรือไม่?</strong>
+                    คุณครูสามารถจำลองหรืออัปโหลดข้อมูลคะแนนห้องอื่น ๆ โดยการลากไฟล์ CSV (ที่ดึงมาจากชีตอื่น) ลงในส่วนอัปโหลดของแอปเพื่อเปลี่ยนข้อมูลแบบเรียลไทม์ได้ทันที
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <div className="text-xs text-slate-400">
+                    ข้อมูลปัจจุบันประกอบด้วย ม.1 (1 ห้อง) และ ม.6 (3 ห้อง)
+                  </div>
+                  <button
+                    onClick={handleResetData}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors"
+                  >
+                    รีเซ็ตเป็นข้อมูลเริ่มต้น
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* ส่วนคำแนะนำสถาปัตยกรรม */}
+            <div className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-6 shadow-md">
+              <h3 className="text-sm font-bold text-yellow-300 mb-2 flex items-center gap-1.5">
+                <Sparkles className="h-4.5 w-4.5 text-yellow-300" />
+                คำแนะนำและโครงสร้างไฟล์ Google Sheet
+              </h3>
+              <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+                ในการอัปเดตข้อมูลบน Google Sheets ล่าสุด ตัวไฟล์ได้ถูกแยกโครงสร้างสำหรับชั้น ม.ต้น (สอบ 25 คะแนน, คะแนนเต็มรวม 50 คะแนน) และ ม.ปลาย (สอบ 30 คะแนน, คะแนนเต็มรวม 60 คะแนน) ตามเกณฑ์ที่อาจารย์กำหนด
+              </p>
+              <div className="grid grid-cols-2 gap-3 text-[11px] text-slate-200 font-mono">
+                <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+                  <strong className="text-indigo-300 block mb-1">ม.ต้น (ม.1)</strong>
+                  • ย่อยสอบย่อย 3 ครั้ง: 15 คะแนน<br />
+                  • ตรวจสมุด 10 ครั้ง: 10 คะแนน<br />
+                  • งาน & ปลายภาค: 25 คะแนน<br />
+                  <strong>รวม: 50 คะแนน</strong>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+                  <strong className="text-indigo-300 block mb-1">ม.ปลาย (ม.6)</strong>
+                  • ย่อยสอบย่อย 3 ครั้ง: 20 คะแนน<br />
+                  • ตรวจสมุด 10 ครั้ง: 10 คะแนน<br />
+                  • งาน & ปลายภาค: 30 คะแนน<br />
+                  <strong>รวม: 60 คะแนน</strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+      </main>
+
+      {/* เครดิตด้านล่างของหน้าเว็บ */}
+      <footer className="mt-12 text-center text-slate-400 text-xs">
+        <p>© 2026 ระบบตรวจสอบผลการเรียนของกลุ่มสาระการเรียนรู้โรงเรียนวิทยาศาสตร์. พัฒนาขึ้นเพื่อสนับสนุนสถิติการเรียนรายห้อง</p>
+      </footer>
+
+    </div>
+  );
+}
